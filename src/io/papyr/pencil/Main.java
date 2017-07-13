@@ -1,78 +1,63 @@
 package io.papyr.pencil;
 
-
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
 import javafx.application.Application;
-import javafx.geometry.Pos;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.input.MouseButton;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
+import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-import javafx.util.Duration;
+import javafx.util.Pair;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
+/**
+ * Created by lucam on 13.07.2017.
+ */
 public class Main extends Application {
-    private Tile[][] map;
-    private Pane root = new Pane();
-
-    private Parent drawGrid(int x, int y, int w, int h) {
-        map = new Tile[x][y];
-        root.setPrefSize((x * w) + 1, (y * h) + 1);
-        for (int i = 0; i < x; i++) {
-            for (int j = 0; j < y; j++) {
-                Tile tile = new Tile(w,h);
-                tile.setTranslateX(j * w);
-                tile.setTranslateY(i * h);
-                root.getChildren().add(tile);
-                map[j][i] = tile;
+    public static void main(String[] args) {
+        Platform.runLater(() -> {
+            try {
+                Dialog<List<String>> dialog = new Dialog<>();
+                dialog.setTitle("Map Info");
+                ButtonType loginButtonType = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+                dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+                GridPane gridPane = new GridPane();
+                TextField width = new TextField("width");
+                TextField height = new TextField("height");
+                TextField x = new TextField("amount x");
+                TextField y = new TextField("amount y");
+                gridPane.add(width, 0, 0);
+                gridPane.add(height, 0, 1);
+                gridPane.add(x, 0, 2);
+                gridPane.add(y, 0, 3);
+                dialog.getDialogPane().setContent(gridPane);
+                Platform.runLater(width::requestFocus);
+                dialog.setResultConverter(dialogButton -> {
+                    if (dialogButton == loginButtonType) {
+                        return Arrays.asList(width.getText(), height.getText(), x.getText(), y.getText());
+                    }
+                    return null;
+                });
+                Optional<List<String>> result = dialog.showAndWait();
+                result.ifPresent(r -> {
+                    Data.width = Integer.parseInt(r.get(0));
+                    Data.height = Integer.parseInt(r.get(1));
+                    Data.amountX = Integer.parseInt(r.get(2));
+                    Data.amountY = Integer.parseInt(r.get(3));
+                });
+                new Editor().start(new Stage());
+                new ToolBox().start(new Stage());
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }
-        return root;
+        });
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        primaryStage.setScene(new Scene(drawGrid(20,20,20,20)));
-        primaryStage.show();
-    }
 
-    private class Tile extends StackPane {
-        Color color = null;
-
-        public Tile(int w, int h) {
-            Rectangle border = new Rectangle(w, h);
-            border.setFill(color);
-            border.setStroke(Color.BLACK);
-            setAlignment(Pos.CENTER);
-            getChildren().addAll(border);
-            setOnMouseClicked(event -> {
-               if (event.getButton() == MouseButton.PRIMARY) {
-                    border.setFill(color);
-                }
-            });
-        }
-
-        public void setColor(Color color) {
-            this.color = color;
-        }
-
-        public Color getColor() {
-            return this.color;
-        }
-    }
-
-    public static void main(String[] args) {
-        launch(args);
     }
 }
