@@ -25,10 +25,10 @@ public class Main extends Application {
                 ButtonType loginButtonType = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
                 dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
                 GridPane gridPane = new GridPane();
-                TextField width = new TextField("width");
-                TextField height = new TextField("height");
-                TextField x = new TextField("amount x");
-                TextField y = new TextField("amount y");
+                TextField width = new TextField(String.valueOf(Data.width));
+                TextField height = new TextField(String.valueOf(Data.height));
+                TextField x = new TextField(String.valueOf(Data.amountX));
+                TextField y = new TextField(String.valueOf(Data.amountY));
                 gridPane.add(width, 0, 0);
                 gridPane.add(height, 0, 1);
                 gridPane.add(x, 0, 2);
